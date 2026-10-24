@@ -1,0 +1,48 @@
+robot:
+  name: "quadruped_12dof"
+  total_mass: 12.5 # kg
+  base_mass: 6.0   # kg
+  num_legs: 4
+  dof_per_leg: 3
+  total_dof: 12
+
+kinematics:
+  body_length: 0.38 # m
+  body_width: 0.20  # m
+  l_hip: 0.08       # m
+  l_thigh: 0.21     # m
+  l_calf: 0.21      # m
+  nominal_height: 0.28 # m
+
+joints:
+  names:
+    - "FL_hip_joint"
+    - "FL_thigh_joint"
+    - "FL_calf_joint"
+    - "FR_hip_joint"
+    - "FR_thigh_joint"
+    - "FR_calf_joint"
+    - "RL_hip_joint"
+    - "RL_thigh_joint"
+    - "RL_calf_joint"
+    - "RR_hip_joint"
+    - "RR_thigh_joint"
+    - "RR_calf_joint"
+
+  nominal_angles: [0.0, 0.72, -1.44,
+                   0.0, 0.72, -1.44,
+                   0.0, 0.72, -1.44,
+                   0.0, 0.72, -1.44]
+
+  limits:
+    hip_roll: [-0.80, 0.80]     # rad
+    hip_pitch: [-1.00, 3.50]    # rad
+    knee_pitch: [-2.70, -0.60]  # rad
+    max_torque: 35.5            # N*m
+    max_velocity: 21.0          # rad/s
+
+control:
+  kp: 40.0 # N*m/rad
+  kd: 1.0  # N*m*s/rad
+  decimation: 4 # Simulation substeps per RL action
+  action_scale: 0.25 # Scale of normalized action to rad
