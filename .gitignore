@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.venv/
+env/
+venv/
+
+# PyTorch / Checkpoints
+*.pt
+*.pth
+*.onnx
+runs/
+wandb/
+
+# ROS 2 / Colcon
+install/
+log/
+*.log
+
+# Editors & OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
