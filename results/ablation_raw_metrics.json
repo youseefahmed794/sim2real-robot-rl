@@ -1,0 +1,491 @@
+{
+  "git_commit": "6ee7f6f9a296cf0a86925faa65b3071b8bb2ea1d",
+  "dr_train_config": {
+    "friction": {
+      "min": 0.4,
+      "max": 1.0,
+      "nominal": 0.8
+    },
+    "base_mass_scale": {
+      "min": 0.85,
+      "max": 1.15,
+      "nominal": 1.0
+    },
+    "latency_ms": {
+      "min": 0.0,
+      "max": 10.0,
+      "nominal": 0.0
+    },
+    "push_impulse": {
+      "max_force_n": 15.0,
+      "interval_s": 2.0
+    }
+  },
+  "eval_suites_config": {
+    "in_distribution": {
+      "nominal": {
+        "description": "Nominal dynamics (in-distribution baseline)",
+        "friction": 0.8,
+        "base_mass_scale": 1.0,
+        "latency_ms": 0.0,
+        "push_force_n": 0.0
+      }
+    },
+    "held_out": {
+      "low_friction": {
+        "description": "Ice/slick tile terrain (friction strictly below training min 0.40)",
+        "friction": 0.15,
+        "base_mass_scale": 1.0,
+        "latency_ms": 0.0,
+        "push_force_n": 0.0,
+        "tested_parameter": "friction",
+        "test_type": "below_min"
+      },
+      "high_friction": {
+        "description": "High traction rubber mat (friction strictly above training max 1.00)",
+        "friction": 1.4,
+        "base_mass_scale": 1.0,
+        "latency_ms": 0.0,
+        "push_force_n": 0.0,
+        "tested_parameter": "friction",
+        "test_type": "above_max"
+      },
+      "heavy_payload": {
+        "description": "Overloaded payload mass (+30% strictly above training max +15%)",
+        "friction": 0.8,
+        "base_mass_scale": 1.3,
+        "latency_ms": 0.0,
+        "push_force_n": 0.0,
+        "tested_parameter": "base_mass_scale",
+        "test_type": "above_max"
+      },
+      "high_latency": {
+        "description": "Severe communication delay spike (40 ms strictly above training max 10 ms)",
+        "friction": 0.8,
+        "base_mass_scale": 1.0,
+        "latency_ms": 40.0,
+        "push_force_n": 0.0,
+        "tested_parameter": "latency_ms",
+        "test_type": "above_max"
+      },
+      "strong_push": {
+        "description": "High impulse push disturbance (30 N strictly above training max 15 N)",
+        "friction": 0.8,
+        "base_mass_scale": 1.0,
+        "latency_ms": 0.0,
+        "push_force_n": 30.0,
+        "tested_parameter": "push_force_n",
+        "test_type": "above_max"
+      }
+    }
+  },
+  "timestamp": "2026-10-25 16:26:55",
+  "condition_C_baseline": {
+    "nominal": {
+      "fall_rate": 0.0,
+      "survival_rate": 1.0,
+      "mean_tracking_rmse": 0.27369947046604803,
+      "mean_distance": 0.9433115732535922,
+      "mean_survival_time": 4.0,
+      "mean_cot": 1.2227042222685323,
+      "valid_cot_episodes": 50
+    },
+    "low_friction": {
+      "fall_rate": 0.0,
+      "survival_rate": 1.0,
+      "mean_tracking_rmse": 0.27369947046604803,
+      "mean_distance": 0.9433115732535922,
+      "mean_survival_time": 4.0,
+      "mean_cot": 1.2227042222685323,
+      "valid_cot_episodes": 50
+    },
+    "high_friction": {
+      "fall_rate": 0.0,
+      "survival_rate": 0.64,
+      "mean_tracking_rmse": 0.3558182442544388,
+      "mean_distance": 0.5663498111230982,
+      "mean_survival_time": 4.0,
+      "mean_cot": 2.199810923362337,
+      "valid_cot_episodes": 50
+    },
+    "heavy_payload": {
+      "fall_rate": 0.0,
+      "survival_rate": 1.0,
+      "mean_tracking_rmse": 0.3413312573444944,
+      "mean_distance": 0.6446331075337466,
+      "mean_survival_time": 4.0,
+      "mean_cot": 2.0327994813354118,
+      "valid_cot_episodes": 50
+    },
+    "high_latency": {
+      "fall_rate": 0.0,
+      "survival_rate": 1.0,
+      "mean_tracking_rmse": 0.25816162860843944,
+      "mean_distance": 0.9892194870820841,
+      "mean_survival_time": 4.0,
+      "mean_cot": 1.0307480601375434,
+      "valid_cot_episodes": 50
+    },
+    "strong_push": {
+      "fall_rate": 0.0,
+      "survival_rate": 1.0,
+      "mean_tracking_rmse": 0.27593680616216953,
+      "mean_distance": 0.939467587271989,
+      "mean_survival_time": 4.0,
+      "mean_cot": 1.2571333964305607,
+      "valid_cot_episodes": 50
+    }
+  },
+  "condition_A_nominal_per_seed": {
+    "nominal": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058490043972441,
+        "mean_distance": -0.02341065960974437,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5057631864812413,
+        "mean_distance": -0.02306882049946801,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058406170346561,
+        "mean_distance": -0.023377947877950032,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "low_friction": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058490043972441,
+        "mean_distance": -0.02341065960974437,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5057631864812413,
+        "mean_distance": -0.02306882049946801,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058406170346561,
+        "mean_distance": -0.023377947877950032,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "high_friction": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5055533532075374,
+        "mean_distance": -0.02222406290311265,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5054638869595959,
+        "mean_distance": -0.02186779647678641,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5055462683487952,
+        "mean_distance": -0.022196051592908068,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "heavy_payload": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5056496344068593,
+        "mean_distance": -0.02259156855967002,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5055585511657649,
+        "mean_distance": -0.022229346519527543,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5056325668160067,
+        "mean_distance": -0.022524337792229572,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "high_latency": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058666603674904,
+        "mean_distance": -0.023481155603442175,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5057732186197076,
+        "mean_distance": -0.023109082635266606,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058236650095319,
+        "mean_distance": -0.023309951580956813,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "strong_push": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5060057370709866,
+        "mean_distance": -0.024153846213166737,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5059222430228354,
+        "mean_distance": -0.023821129565482414,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.505997163655946,
+        "mean_distance": -0.024119959415664933,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ]
+  },
+  "condition_B_dr_per_seed": {
+    "nominal": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058490043972441,
+        "mean_distance": -0.02341065960974437,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5057631864812413,
+        "mean_distance": -0.02306882049946801,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058406170346561,
+        "mean_distance": -0.023377947877950032,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "low_friction": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058490043972441,
+        "mean_distance": -0.02341065960974437,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5057631864812413,
+        "mean_distance": -0.02306882049946801,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058406170346561,
+        "mean_distance": -0.023377947877950032,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "high_friction": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5055533532075374,
+        "mean_distance": -0.02222406290311265,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5054638869595959,
+        "mean_distance": -0.02186779647678641,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5055462683487952,
+        "mean_distance": -0.022196051592908068,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "heavy_payload": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5056496344068593,
+        "mean_distance": -0.02259156855967002,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5055585511657649,
+        "mean_distance": -0.022229346519527543,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5056325668160067,
+        "mean_distance": -0.022524337792229572,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "high_latency": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058666603674904,
+        "mean_distance": -0.023481155603442175,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5057732186197076,
+        "mean_distance": -0.023109082635266606,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5058236650095319,
+        "mean_distance": -0.023309951580956813,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ],
+    "strong_push": [
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5060057370709866,
+        "mean_distance": -0.024153846213166737,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.5059222430228354,
+        "mean_distance": -0.023821129565482414,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      },
+      {
+        "fall_rate": 0.0,
+        "survival_rate": 0.0,
+        "mean_tracking_rmse": 0.505997163655946,
+        "mean_distance": -0.024119959415664933,
+        "mean_survival_time": 4.0,
+        "mean_cot": NaN,
+        "valid_cot_episodes": 0
+      }
+    ]
+  }
+}
