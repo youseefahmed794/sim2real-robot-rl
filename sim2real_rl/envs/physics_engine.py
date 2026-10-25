@@ -1,8 +1,11 @@
 """
-High-Fidelity Multi-Body Contact Dynamics Physics Engine for 12-DOF Quadruped Robot.
-Implements 6-DOF floating-base dynamics, actuator PD modeling with torque limits,
-Hunt-Crossley compliant ground contact forces with Coulomb friction cone,
-and optional MuJoCo C-engine acceleration.
+Mock Quadruped Physics Engine (Lightweight Test Double).
+
+NOTE: This is a lightweight analytical spring-damper test double designed for
+headless CI unit tests and fast mathematical verification without requiring
+MuJoCo C binaries or GPU drivers.
+For full multi-body articulated rigid dynamics and non-linear contact complementarity,
+use the primary MuJoCoQuadrupedEnv (sim2real_rl.envs.mujoco_env).
 
 Author: Youseef Abdel Tawwab
 """
