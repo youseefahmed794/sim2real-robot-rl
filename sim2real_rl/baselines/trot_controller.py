@@ -23,8 +23,8 @@ class AnalyticalTrotController:
 
     def __init__(
         self,
-        stride_frequency: float = 2.0,     # Hz (steps per second)
-        step_height: float = 0.045,        # m (swing foot clearance)
+        stride_frequency: float = 1.5,     # Hz (tuned from 2.0 Hz for swing foot clearance)
+        step_height: float = 0.08,         # m (tuned from 0.045 m to eliminate foot stubbing)
         nominal_height: float = 0.325,     # m (standing base height)
         l_hip: float = 0.08,               # m
         l_thigh: float = 0.21,             # m

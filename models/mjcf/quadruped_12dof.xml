@@ -39,7 +39,7 @@
           <body name="FL_calf" pos="0 0 -0.21">
             <inertial pos="0 0 -0.10" mass="0.32" diaginertia="0.0018 0.0019 0.0002"/>
             <joint name="FL_calf_joint" type="hinge" axis="0 1 0" range="-2.70 -0.60"/>
-            <geom name="FL_calf_geom" type="capsule" fromto="0 0 0 0 0 -0.21" size="0.015"/>
+            <geom name="FL_calf_geom" type="capsule" fromto="0 0 0 0 0 -0.18" size="0.015"/>
             <geom name="FL_foot" type="sphere" pos="0 0 -0.21" size="0.022" material="foot_rubber"/>
           </body>
         </body>
@@ -59,7 +59,7 @@
           <body name="FR_calf" pos="0 0 -0.21">
             <inertial pos="0 0 -0.10" mass="0.32" diaginertia="0.0018 0.0019 0.0002"/>
             <joint name="FR_calf_joint" type="hinge" axis="0 1 0" range="-2.70 -0.60"/>
-            <geom name="FR_calf_geom" type="capsule" fromto="0 0 0 0 0 -0.21" size="0.015"/>
+            <geom name="FR_calf_geom" type="capsule" fromto="0 0 0 0 0 -0.18" size="0.015"/>
             <geom name="FR_foot" type="sphere" pos="0 0 -0.21" size="0.022" material="foot_rubber"/>
           </body>
         </body>
@@ -79,7 +79,7 @@
           <body name="RL_calf" pos="0 0 -0.21">
             <inertial pos="0 0 -0.10" mass="0.32" diaginertia="0.0018 0.0019 0.0002"/>
             <joint name="RL_calf_joint" type="hinge" axis="0 1 0" range="-2.70 -0.60"/>
-            <geom name="RL_calf_geom" type="capsule" fromto="0 0 0 0 0 -0.21" size="0.015"/>
+            <geom name="RL_calf_geom" type="capsule" fromto="0 0 0 0 0 -0.18" size="0.015"/>
             <geom name="RL_foot" type="sphere" pos="0 0 -0.21" size="0.022" material="foot_rubber"/>
           </body>
         </body>
@@ -99,7 +99,7 @@
           <body name="RR_calf" pos="0 0 -0.21">
             <inertial pos="0 0 -0.10" mass="0.32" diaginertia="0.0018 0.0019 0.0002"/>
             <joint name="RR_calf_joint" type="hinge" axis="0 1 0" range="-2.70 -0.60"/>
-            <geom name="RR_calf_geom" type="capsule" fromto="0 0 0 0 0 -0.21" size="0.015"/>
+            <geom name="RR_calf_geom" type="capsule" fromto="0 0 0 0 0 -0.18" size="0.015"/>
             <geom name="RR_foot" type="sphere" pos="0 0 -0.21" size="0.022" material="foot_rubber"/>
           </body>
         </body>
