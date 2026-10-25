@@ -4,8 +4,8 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?logo=pytorch)](https://pytorch.org)
 [![ROS 2](https://img.shields.io/badge/ROS_2-Jazzy_Jalisco-3498db?logo=ros)](https://docs.ros.org/en/jazzy/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Development Status](https://img.shields.io/badge/Status-Day%202%20Completed-brightgreen.svg)](docs/ROADMAP.md)
-[![Tests](https://img.shields.io/badge/Tests-28%20Passed-brightgreen)](test/)
+[![Development Status](https://img.shields.io/badge/Status-Day%203%20PPO%20Completed-brightgreen.svg)](docs/ROADMAP.md)
+[![Tests](https://img.shields.io/badge/Tests-40%20Passed%20(100%25)-brightgreen)](https://github.com/youseefahmed794/sim2real-robot-rl)
 
 A production-grade, research-oriented **Sim-to-Real Reinforcement Learning framework** for dynamic legged robot locomotion. Designed to train agile, robust locomotion policies on a 12-DOF quadruped robot and transfer zero-shot to physical systems via comprehensive **Domain Randomization**, observation delay compensation, and a real-time ROS 2 deployment pipeline.
 
@@ -85,7 +85,7 @@ Development is structured into daily verified milestones:
 |---|---|---|---|
 | **Day 1** | **Robot Modeling & Kinematics** | 🚀 **Completed** | 12-DOF URDF + MJCF models, $SO(3)$ spatial math, unit tests |
 | **Day 2** | **Gymnasium Locomotion Env** | 🚀 **Completed** | 48-dim state, 12-dim action, multi-reward decomposition, terrain generator |
-| **Day 3** | **PPO Policy & Rollout Buffer** | ⏳ Planned | Actor-Critic networks, vectorized GAE buffer, training loop |
+| **Day 3** | **PPO Policy & Rollout Buffer** | 🚀 **Completed** | Actor-Critic networks, vectorized GAE buffer, clipped surrogate loss |
 | **Day 4** | **Sim-to-Real Randomization** | ⏳ Planned | Mass, friction, damping, push impulses, delay buffer |
 | **Day 5** | **Classical MPC Baseline** | ⏳ Planned | Simplified MPC comparison, energy/stability benchmarks |
 | **Day 6** | **Test Suite & CI Pipeline** | ⏳ Planned | 100% Pytest test coverage, GitHub Actions workflow |

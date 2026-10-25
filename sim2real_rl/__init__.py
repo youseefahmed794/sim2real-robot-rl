@@ -13,6 +13,13 @@ from sim2real_rl.envs import (
     PhysicsConfig,
     QuadrupedPhysicsEngine,
 )
+from sim2real_rl.algo import (
+    ActorCritic,
+    NumpyMLP,
+    RolloutBuffer,
+    PPO,
+    PPOConfig,
+)
 
 __version__ = "0.1.0"
 
@@ -25,4 +32,9 @@ __all__ = [
     "RewardConfig",
     "PhysicsConfig",
     "QuadrupedPhysicsEngine",
+    "ActorCritic",
+    "NumpyMLP",
+    "RolloutBuffer",
+    "PPO",
+    "PPOConfig",
 ]

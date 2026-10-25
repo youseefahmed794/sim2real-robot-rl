@@ -70,12 +70,13 @@ graph TD
 - [x] Procedural terrain engine (`ProceduralTerrain`) supporting flat ground, incline slopes, fractal rough heightfields, discrete stairs, and stepping stones.
 - [x] 28 comprehensive automated unit and integration tests (100% pass rate).
 
-### ⏳ Day 3: PPO Policy & Training Loop
-- [ ] PyTorch Actor-Critic architecture with Orthogonal Initialization.
-- [ ] PPO clipped surrogate objective with entropy bonus and value function loss.
-- [ ] High-throughput vectorized rollout buffer with GAE advantage computation.
+### ✅ Day 3: PPO Policy & Training Loop
+- [x] Actor-Critic neural network architecture (`ActorCritic`, `NumpyMLP`) with Orthogonal initialization and diagonal Gaussian policy parameterization.
+- [x] On-policy rollout buffer (`RolloutBuffer`) with Generalized Advantage Estimation (GAE-Lambda) and advantage normalization.
+- [x] PPO algorithm (`PPO`) with clipped surrogate objective, value function loss, entropy exploration bonus, and KL divergence early stopping.
+- [x] Complete test suite (`test_network.py`, `test_buffer.py`, `test_ppo.py`) with 40 passing tests across the entire package.
 
-### ⏳ Day 4: Sim-to-Real Domain Randomization
+### ⏳ Day 4: Sim-to-Real Domain Randomization (Next)
 - [ ] Physics randomization: Link mass variation ($\pm 15\%$), ground friction ($\mu \in [0.2, 1.2]$), motor damping.
 - [ ] Observation delay buffer simulating realistic microcontroller communication latency (10–30 ms).
 - [ ] Periodic random external impulse pushes ($F_{\text{push}} \in [10, 40]\,\text{N}$).

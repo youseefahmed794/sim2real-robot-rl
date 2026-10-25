@@ -1,0 +1,29 @@
+algorithm:
+  name: "PPO"
+  clip_param: 0.2
+  value_loss_coef: 0.5
+  entropy_coef: 0.005
+  max_grad_norm: 0.5
+  gamma: 0.99
+  lam: 0.95
+  target_kl: 0.015
+
+training:
+  num_epochs: 5
+  num_mini_batches: 4
+  mini_batch_size: 64
+  learning_rate: 0.0003
+  lr_schedule: "linear"
+  total_timesteps: 1000000
+
+network:
+  observation_dim: 48
+  action_dim: 12
+  hidden_dims: [256, 128, 64]
+  activation: "tanh"
+  init_std: 1.0
+  min_std: 0.05
+  orthogonal_init: true
+  actor_gain: 0.01
+  critic_gain: 1.0
+  hidden_gain: 1.4142 # sqrt(2)
