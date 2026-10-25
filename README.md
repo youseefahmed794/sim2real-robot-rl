@@ -5,8 +5,7 @@
 [![ROS 2](https://img.shields.io/badge/ROS_2-Jazzy_Jalisco-3498db?logo=ros)](https://docs.ros.org/en/jazzy/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Development Status](https://img.shields.io/badge/Status-Day%206%20MuJoCo%20%26%20Ablations%20Completed-brightgreen.svg)](docs/ROADMAP.md)
-[![Tests](https://img.shields.io/badge/Tests-46%20Passed-brightgreen)](https://github.com/youseefahmed794/sim2real-robot-rl)
-[![Coverage](https://img.shields.io/badge/Coverage-89%25-brightgreen)](https://github.com/youseefahmed794/sim2real-robot-rl)
+[![Tests](https://img.shields.io/badge/Tests-54%20passed%2C%200%20skipped%20%7C%2089%25%20coverage-brightgreen)](https://github.com/youseefahmed794/sim2real-robot-rl)
 [![Physics](https://img.shields.io/badge/Physics-MuJoCo%203.17-blue)](https://mujoco.org)
 
 A production-grade, research-oriented **Sim-to-Real Reinforcement Learning framework** for dynamic legged robot locomotion. Designed to train agile, robust locomotion policies on a 12-DOF quadruped robot and transfer zero-shot to physical systems via comprehensive **Domain Randomization**, observation delay compensation, and a real-time ROS 2 deployment pipeline.
@@ -114,37 +113,49 @@ We formulate locomotion as an infinite-horizon discounted Markov Decision Proces
 
 ---
 
-## 📊 Empirical Sim-to-Real Ablation & Classical Baseline
+## 📊 Empirical Sim-to-Sim Ablation & Classical Baseline
 
-To rigorously validate sim-to-real claims without ungrounded assertions, we conduct multi-seed training ($N=3$, seeds: `[42, 43, 44]`) using native MuJoCo physics and evaluate policies on held-out, out-of-distribution dynamic conditions against a classical analytical Inverse Kinematics trotting controller baseline. Full experimental logs and statistical breakdowns are published in [docs/SIM2REAL_ABLATION_REPORT.md](docs/SIM2REAL_ABLATION_REPORT.md).
+> [!IMPORTANT]
+> **Sim-to-Sim Verification Only**: These benchmarks evaluate numerical robustness and domain generalization within the native **MuJoCo 3.17** rigid-body physics simulator. **No hardware was used**, and these results do not claim zero-shot hardware transfer.
 
-### Experimental Setup & Out-of-Distribution (OOD) Stress Scenarios
-- **Nominal Environment**: Ground friction $\mu = 0.8$, nominal mass $m = 12.48\,\text{kg}$, zero latency.
-- **Slick Surface Stress Test**: Ground friction reduced to $\mu = 0.25$ (simulating wet tile or smooth ice).
-- **Overloaded Robot Stress Test**: $+2.5\,\text{kg}$ additional payload mass ($+20\%$ mass discrepancy).
-- **Stochastic Communication Latency**: $20\,\text{ms}$ control latency queue between policy action and actuator torque application.
+All evaluations follow the strict evaluation protocol defined in [`configs/dr_train.yaml`](configs/dr_train.yaml) and [`configs/eval_suites.yaml`](configs/eval_suites.yaml), where all held-out stress suites lie strictly outside training bounds (verified via automated regression test `test_eval_protocol.py`). Raw execution logs are preserved in [`results/ablation_raw_metrics.json`](results/ablation_raw_metrics.json).
 
-### Quantitative Multi-Seed Benchmark Results
+### Evaluation Setup (50 Episodes Per Suite, Fixed Seeds 1000–1049)
+- **Nominal** (In-distribution): $\mu = 0.80$, base mass $6.0\,\text{kg}$, $0\,\text{ms}$ delay, $0\,\text{N}$ push.
+- **Low Friction** (Held-out): $\mu = 0.15$ ($< 0.40$ training min).
+- **High Friction** (Held-out): $\mu = 1.40$ ($> 1.00$ training max).
+- **Heavy Payload** (Held-out): Base mass $+30\%$ ($> +15\%$ training max).
+- **High Latency** (Held-out): $40\,\text{ms}$ delay ($> 10\,\text{ms}$ training max).
+- **Strong Push** (Held-out): $30\,\text{N}$ lateral impulse ($> 15\,\text{N}$ training max).
 
-| Policy Configuration | Scenario | Mean Reward | Survival Rate | Mean Pitch (deg) | Mean Roll (deg) | Cost of Transport (COT) |
-|---|---|---|---|---|---|---|
-| **Classical IK Trot Baseline** | Nominal ($\mu=0.8$) | $28.17 \pm 0.00$ | **100%** | $1.72^\circ$ | $0.06^\circ$ | $177.53$ |
-| **Classical IK Trot Baseline** | Slick Surface ($\mu=0.25$) | $28.09 \pm 0.00$ | **100%** | $1.68^\circ$ | $0.06^\circ$ | $177.53$ |
-| **Classical IK Trot Baseline** | Overloaded ($+2.5\,\text{kg}$) | $28.16 \pm 0.00$ | **100%** | $1.70^\circ$ | $0.06^\circ$ | $177.53$ |
-| **Classical IK Trot Baseline** | Latency ($20\,\text{ms}$) | $28.17 \pm 0.00$ | **100%** | $1.72^\circ$ | $0.06^\circ$ | $177.53$ |
-| **PPO Policy (Nominal Training)** | Nominal ($\mu=0.8$) | $29.98 \pm 0.06$ | **100%** | $0.74^\circ$ | $0.00^\circ$ | **3.24** |
-| **PPO Policy (Nominal Training)** | Slick Surface ($\mu=0.25$) | $29.98 \pm 0.06$ | **100%** | $0.74^\circ$ | $0.00^\circ$ | **3.24** |
-| **PPO Policy (Nominal Training)** | Overloaded ($+2.5\,\text{kg}$) | $29.98 \pm 0.06$ | **100%** | $0.74^\circ$ | $0.00^\circ$ | **3.24** |
-| **PPO Policy (Nominal Training)** | Latency ($20\,\text{ms}$) | $29.98 \pm 0.06$ | **100%** | $0.74^\circ$ | $0.00^\circ$ | **3.24** |
-| **PPO Policy (Domain-Randomized)** | Nominal ($\mu=0.8$) | $29.98 \pm 0.06$ | **100%** | $0.74^\circ$ | $0.00^\circ$ | **3.24** |
-| **PPO Policy (Domain-Randomized)** | Slick Surface ($\mu=0.25$) | $29.98 \pm 0.06$ | **100%** | $0.74^\circ$ | $0.00^\circ$ | **3.24** |
-| **PPO Policy (Domain-Randomized)** | Overloaded ($+2.5\,\text{kg}$) | $29.98 \pm 0.06$ | **100%** | $0.74^\circ$ | $0.00^\circ$ | **3.24** |
-| **PPO Policy (Domain-Randomized)** | Latency ($20\,\text{ms}$) | $29.98 \pm 0.06$ | **100%** | $0.74^\circ$ | $0.00^\circ$ | **3.24** |
+### Quantitative Multi-Seed Benchmark Results (Mean ± Std Across Seeds)
 
-### Key Physics & Empirical Observations
-1. **Actuator Energy Efficiency**: The early-stage PPO policy converges to an energy-minimizing postural stabilization strategy (COT $\approx 3.24$) that reduces high-frequency joint oscillation by $98.2\%$ compared to open-loop analytical gait cycling (COT $\approx 177.53$).
-2. **Posture Regularization**: Both classical IK and PPO maintain $< 2.0^\circ$ of pitch tilt and zero roll across perturbed payloads and friction degradation.
-3. **Transparent Physics Engine Distinction**: The repository strictly distinguishes between `MuJoCoQuadrupedEnv` (first-principles rigid body dynamics and convex contact optimization via official C bindings) and `MockPhysicsEngine` (a lightweight numerical test double explicitly reserved for fast headless CI checks without external binary dependencies).
+| Suite | Method | Survival Rate | Distance (m) | Tracking RMSE (m/s) | CoT |
+|---|---|:---:|:---:|:---:|:---:|
+| **nominal** | Tuned Trot Baseline | **100.0%** | $+0.94\,\text{m}$ | $0.274$ | **1.22** |
+| **nominal** | PPO (Nominal, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **nominal** | PPO (With DR, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **low_friction** | Tuned Trot Baseline | **100.0%** | $+0.94\,\text{m}$ | $0.274$ | **1.22** |
+| **low_friction** | PPO (Nominal, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **low_friction** | PPO (With DR, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **high_friction** | Tuned Trot Baseline | $64.0\%$ | $+0.57\,\text{m}$ | $0.356$ | $2.20$ |
+| **high_friction** | PPO (Nominal, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **high_friction** | PPO (With DR, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **heavy_payload** | Tuned Trot Baseline | **100.0%** | $+0.64\,\text{m}$ | $0.341$ | $2.03$ |
+| **heavy_payload** | PPO (Nominal, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **heavy_payload** | PPO (With DR, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **high_latency** | Tuned Trot Baseline | **100.0%** | $+0.99\,\text{m}$ | $0.258$ | **1.03** |
+| **high_latency** | PPO (Nominal, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **high_latency** | PPO (With DR, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **strong_push** | Tuned Trot Baseline | **100.0%** | $+0.94\,\text{m}$ | $0.276$ | $1.26$ |
+| **strong_push** | PPO (Nominal, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+| **strong_push** | PPO (With DR, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
+
+### Honest Diagnosis & Scientific Limitations
+1. **PPO Learning Outcome**: Continuous PPO trained from scratch on CPU MuJoCo with a budget of 50,000–100,000 steps converged to a stationary standing posture (mean velocity $-0.0011\,\text{m/s}$), failing to discover an active walking gait. Under the strict survival criterion requiring forward displacement $\ge 0.5\,\text{m}$, survival is $0.0\%$ and Cost of Transport is undefined (NaN).
+2. **Domain Randomization Finding**: Because the policy did not learn forward locomotion in nominal simulation, applying domain randomization during training did not improve forward velocity tracking.
+3. **Classical Trot Controller Performance**: The tuned analytical IK baseline (`AnalyticalTrotController`, $f=1.5\,\text{Hz}$, $h=0.08\,\text{m}$) achieved forward locomotion across all suites with realistic physical CoT ($1.03$–$2.20$), but experienced increased foot scuffing on high friction ($\mu=1.40$).
+4. **Hardware Gap**: Real hardware deployment introduces backlash, motor temperature limits, and battery voltage sag not captured in simulation. Future RL work should leverage teacher-student imitation or residual control over the classical baseline rather than training from scratch on CPU.
 
 ---
 

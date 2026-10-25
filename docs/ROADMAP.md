@@ -76,20 +76,22 @@ graph TD
 - [x] PPO algorithm (`PPO`) with clipped surrogate objective, value function loss, entropy exploration bonus, and KL divergence early stopping.
 - [x] Complete test suite (`test_network.py`, `test_buffer.py`, `test_ppo.py`) with 40 passing tests across the entire package.
 
-### ✅ Day 4: Native MuJoCo Physics & Sim-to-Real Domain Randomization
+### ✅ Day 4: Native MuJoCo Physics & Domain Randomization Framework
 - [x] Official Python `mujoco` (v3.17+) rigid-body simulation environment (`MuJoCoQuadrupedEnv`).
-- [x] Standing equilibrium verified ($z = 0.3256\,\text{m}$, roll $< 10^{-15}\,\text{rad}$, holding torque $5.64\,\text{N}\cdot\text{m} < 35.5\,\text{N}\cdot\text{m}$).
-- [x] Clear architectural separation: labeled `MockPhysicsEngine` as lightweight test double, reserving `MuJoCoQuadrupedEnv` for high-fidelity RL.
-- [x] Dynamics randomization: Link mass variation ($\pm 20\%$), foot friction ($\mu \in [0.2, 1.2]$), observation latency emulation buffer (20 ms).
+- [x] Standing equilibrium verified ($z = 0.3304\,\text{m}$, roll $< 0.3^\circ$, holding torque $5.64\,\text{N}\cdot\text{m} \ll 35.5\,\text{N}\cdot\text{m}$).
+- [x] Clear architectural separation: labeled `MockPhysicsEngine` as lightweight test double, reserving `MuJoCoQuadrupedEnv` for high-fidelity physics.
+- [x] Configuration-driven DR (`configs/dr_train.yaml`): friction $[0.40, 1.00]$, mass scale $\pm 15\%$, latency $0$–$10\,\text{ms}$, push $\le 15\,\text{N}$.
 
-### ✅ Day 5: Classical Control Baseline & Multi-Seed Sim-to-Real Ablations
-- [x] Analytical Inverse Kinematics Trotting Gait Controller baseline (`TrotGaitController`) with parameterized swing trajectory and stance foot placement.
-- [x] Multi-seed empirical training & evaluation script (`train_and_evaluate.py`) across seeds `[42, 43, 44]`.
-- [x] Comprehensive Sim-to-Real ablation report (`docs/SIM2REAL_ABLATION_REPORT.md`) benchmarking on 4 held-out physics environments (Nominal, Slick $\mu=0.25$, Overloaded $+2.5\,\text{kg}$, Latency $20\,\text{ms}$).
+### ✅ Day 5: Classical Control Baseline & Multi-Seed Sim-to-Sim Ablation
+- [x] Tuned analytical IK trotting gait generator (`AnalyticalTrotController`, $f=1.5\,\text{Hz}$, $h=0.08\,\text{m}$, $k_p=90, k_d=3$).
+- [x] Strictly defined metric formulas: $P_{\text{mech}} = \sum \max(\tau \dot{q}, 0)$, $\text{CoT} = P_{\text{mech}} / (mgv)$ (returns NaN for $v < 0.05\,\text{m/s}$), survival requiring forward displacement $\ge 0.5\,\text{m}$.
+- [x] Reproducible multi-seed evaluation pipeline (`scripts/run_reproducible_ablation.py`) across 6 suites (50 episodes/suite, fixed seeds 1000–1049).
+- [x] Documented negative results in `docs/SIM2REAL_ABLATION_REPORT.md` (PPO from scratch on CPU budget stays stationary; classical baseline walks with CoT 1.03–1.26).
 
 ### ✅ Day 6: Automated Testing & Verification
-- [x] 46 unit and integration tests with **100% pass rate** (46 passed, 0 skipped, 0 failed) in 11.37s.
-- [x] Measured **89% statement test coverage** (896 / 1004 statements) via `pytest-cov`.
+- [x] 54 unit and integration tests with **100% pass rate** (54 passed, 0 skipped, 0 failed).
+- [x] Measured **89% statement test coverage** (918 / 1026 statements) via `pytest-cov`.
+- [x] Range-validity regression test (`test/test_eval_protocol.py`) asserting all held-out suites lie strictly outside training DR bounds.
 
 ### ⏳ Day 7: Real-Time ROS 2 Deployment & Policy Export
 - [ ] Policy ONNX/TorchScript export pipeline for embedded edge platforms.
