@@ -1,0 +1,45 @@
+environment:
+  action_scale: 0.25 # rad
+  max_episode_steps: 1000
+  control_dt: 0.02   # 50 Hz control rate
+  substep_dt: 0.002  # 500 Hz simulation rate
+  decimation: 10
+
+commands:
+  vx_range: [-0.5, 1.2]  # m/s
+  vy_range: [-0.4, 0.4]  # m/s
+  wz_range: [-1.0, 1.0]  # rad/s
+
+terrain:
+  type: "flat"           # "flat" | "slope" | "rough" | "stairs" | "stepping_stones"
+  default_friction: 0.8
+  friction_range: [0.4, 1.2]
+  roughness_amplitude: 0.035
+  roughness_frequency: 1.5
+  step_width: 0.35
+  step_height: 0.04
+
+rewards:
+  # Tracking
+  w_lin_vel: 1.5
+  w_ang_vel: 0.8
+  sigma_lin_vel: 0.25
+  sigma_ang_vel: 0.50
+
+  # Stability & Posture
+  w_lin_vel_z: -2.0
+  w_ang_vel_xy: -0.05
+  w_orientation: -1.0
+  w_base_height: -10.0
+  nominal_height: 0.28
+
+  # Energy & Smoothness
+  w_torques: -0.0001
+  w_mechanical_power: -0.0002
+  w_action_rate: -0.015
+  w_joint_acc: -2.5e-7
+
+  # Safety & Contacts
+  w_joint_limits: -10.0
+  w_foot_slip: -0.04
+  w_alive: 1.0

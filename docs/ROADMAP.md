@@ -63,10 +63,12 @@ graph TD
 - [x] $SO(3)$ rotation algebra, quaternion kinematics, and forward foot kinematic transforms.
 - [x] Automated unit test suite verifying geometric and inertial parameters.
 
-### ⏳ Day 2: Environment & Reward Formulation
-- [ ] Gymnasium/Gym locomotion environment with realistic reset and step mechanics.
-- [ ] Multi-objective reward function (linear velocity tracking, body stability, torque minimization, foot clearance).
-- [ ] Procedural terrain generation (flat ground, discrete obstacles, incline slopes).
+### ✅ Day 2: Environment & Reward Formulation
+- [x] Gymnasium locomotion environment (`QuadrupedEnv`, `QuadrupedLocomotion-v0`) with 48-dim observation space and 12-dim continuous action space.
+- [x] High-fidelity multi-body contact dynamics engine with Hunt-Crossley spring-damper model and Coulomb friction cone.
+- [x] Multi-objective reward formulation (`RewardManager`) with decomposed velocity tracking, posture stability, torque, power, action rate, joint limit, and foot slip penalties.
+- [x] Procedural terrain engine (`ProceduralTerrain`) supporting flat ground, incline slopes, fractal rough heightfields, discrete stairs, and stepping stones.
+- [x] 28 comprehensive automated unit and integration tests (100% pass rate).
 
 ### ⏳ Day 3: PPO Policy & Training Loop
 - [ ] PyTorch Actor-Critic architecture with Orthogonal Initialization.
