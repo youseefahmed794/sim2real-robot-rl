@@ -1,0 +1,21 @@
+# Training Domain Randomization Configuration
+# Moderate ranges applied during PPO-DR policy training
+
+friction:
+  min: 0.40
+  max: 1.00
+  nominal: 0.80
+
+base_mass_scale:
+  min: 0.85
+  max: 1.15
+  nominal: 1.00
+
+latency_ms:
+  min: 0.0
+  max: 10.0
+  nominal: 0.0
+
+push_impulse:
+  max_force_n: 15.0
+  interval_s: 2.0

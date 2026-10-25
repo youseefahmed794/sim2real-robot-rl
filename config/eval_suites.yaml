@@ -1,0 +1,57 @@
+# Evaluation Suites Configuration
+# Contains in-distribution nominal and held-out stress suites.
+# Every held-out suite MUST have its perturbed parameter strictly outside the training range.
+
+in_distribution:
+  nominal:
+    description: "Nominal dynamics (in-distribution baseline)"
+    friction: 0.80
+    base_mass_scale: 1.00
+    latency_ms: 0.0
+    push_force_n: 0.0
+
+held_out:
+  low_friction:
+    description: "Ice/slick tile terrain (friction strictly below training min 0.40)"
+    friction: 0.15
+    base_mass_scale: 1.00
+    latency_ms: 0.0
+    push_force_n: 0.0
+    tested_parameter: "friction"
+    test_type: "below_min"
+
+  high_friction:
+    description: "High traction rubber mat (friction strictly above training max 1.00)"
+    friction: 1.40
+    base_mass_scale: 1.00
+    latency_ms: 0.0
+    push_force_n: 0.0
+    tested_parameter: "friction"
+    test_type: "above_max"
+
+  heavy_payload:
+    description: "Overloaded payload mass (+30% strictly above training max +15%)"
+    friction: 0.80
+    base_mass_scale: 1.30
+    latency_ms: 0.0
+    push_force_n: 0.0
+    tested_parameter: "base_mass_scale"
+    test_type: "above_max"
+
+  high_latency:
+    description: "Severe communication delay spike (40 ms strictly above training max 10 ms)"
+    friction: 0.80
+    base_mass_scale: 1.00
+    latency_ms: 40.0
+    push_force_n: 0.0
+    tested_parameter: "latency_ms"
+    test_type: "above_max"
+
+  strong_push:
+    description: "High impulse push disturbance (30 N strictly above training max 15 N)"
+    friction: 0.80
+    base_mass_scale: 1.00
+    latency_ms: 0.0
+    push_force_n: 30.0
+    tested_parameter: "push_force_n"
+    test_type: "above_max"
