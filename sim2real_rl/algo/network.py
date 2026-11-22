@@ -5,8 +5,8 @@ Provides an optimized Actor-Critic MLP with:
 - Orthogonal parameter initialization
 - Diagonal Gaussian continuous policy parameterization
 - Independent or shared value function head
-- Pure NumPy forward/backward pass engine for portable zero-dependency deployment
-- Seamless PyTorch module bridge when torch is available
+- NumPy forward-only inference for portable deployment
+- Native differentiable PyTorch training backend (required by PPO)
 
 Author: Youseef Abdel Tawwab
 """
@@ -42,7 +42,7 @@ def orthogonal_init(shape: Tuple[int, int], gain: float = 1.0) -> np.ndarray:
 class NumpyMLP:
     """
     Multi-Layer Perceptron implemented with NumPy.
-    Supports Tanh/ELU activations, orthogonal weights, and analytical gradient caching.
+    Forward-only inference with Tanh/ELU activations and orthogonal weights.
     """
 
     def __init__(
@@ -111,7 +111,7 @@ class NumpyMLP:
 
 class ActorCritic:
     """
-    Complete Actor-Critic Architecture.
+    NumPy inference-only Actor-Critic Architecture (not a training backend).
     - Policy (Actor): Outputs mean action mu(s) and standard deviation sigma
     - Value Function (Critic): Outputs scalar state value V(s)
     """
@@ -259,54 +259,93 @@ class ActorCritic:
         self.log_std = weights["log_std"].copy()
 
 
-# Optional PyTorch Module Wrapper
+# PyTorch is optional for NumPy inference, mandatory for PPO training.
 if TORCH_AVAILABLE:
     class PyTorchActorCritic(nn.Module):
-        """Native PyTorch Actor-Critic module with Orthogonal initialization."""
+        """Trainable latent Gaussian policy. Environment clipping stays outside it."""
 
-        def __init__(
-            self,
-            observation_dim: int = 48,
-            action_dim: int = 12,
-            hidden_dims: Optional[List[int]] = None,
-        ):
+        def __init__(self, observation_dim=48, action_dim=12, hidden_dims=None,
+                     activation="tanh", init_std=1.0, min_std=0.05):
             super().__init__()
-            if hidden_dims is None:
-                hidden_dims = [256, 128, 64]
+            self.observation_dim = observation_dim
+            self.action_dim = action_dim
+            self.hidden_dims = [256, 128, 64] if hidden_dims is None else list(hidden_dims)
+            self.activation = activation
+            self.min_std = min_std
+            if min_std <= 0 or init_std <= 0:
+                raise ValueError("Standard deviations must be positive")
+            activations = {"tanh": nn.Tanh, "elu": nn.ELU, "relu": nn.ReLU}
+            if activation not in activations:
+                raise ValueError(f"Unknown activation: {activation}")
 
-            # Actor
-            actor_layers = []
-            prev_dim = observation_dim
-            for h_dim in hidden_dims:
-                linear = nn.Linear(prev_dim, h_dim)
-                nn.init.orthogonal_(linear.weight, gain=math.sqrt(2))
-                nn.init.constant_(linear.bias, 0.0)
-                actor_layers.extend([linear, nn.Tanh()])
-                prev_dim = h_dim
-            actor_out = nn.Linear(prev_dim, action_dim)
-            nn.init.orthogonal_(actor_out.weight, gain=0.01)
-            nn.init.constant_(actor_out.bias, 0.0)
-            actor_layers.append(actor_out)
-            self.actor = nn.Sequential(*actor_layers)
+            def mlp(output_dim, gain):
+                layers = []
+                dims = [observation_dim] + self.hidden_dims + [output_dim]
+                for i, (din, dout) in enumerate(zip(dims, dims[1:])):
+                    linear = nn.Linear(din, dout)
+                    last = i == len(dims) - 2
+                    nn.init.orthogonal_(linear.weight, gain=gain if last else math.sqrt(2))
+                    nn.init.zeros_(linear.bias)
+                    layers.append(linear)
+                    if not last:
+                        layers.append(activations[activation]())
+                return nn.Sequential(*layers)
 
-            # Critic
-            critic_layers = []
-            prev_dim = observation_dim
-            for h_dim in hidden_dims:
-                linear = nn.Linear(prev_dim, h_dim)
-                nn.init.orthogonal_(linear.weight, gain=math.sqrt(2))
-                nn.init.constant_(linear.bias, 0.0)
-                critic_layers.extend([linear, nn.Tanh()])
-                prev_dim = h_dim
-            critic_out = nn.Linear(prev_dim, 1)
-            nn.init.orthogonal_(critic_out.weight, gain=1.0)
-            nn.init.constant_(critic_out.bias, 0.0)
-            critic_layers.append(critic_out)
-            self.critic = nn.Sequential(*critic_layers)
+            self.actor = mlp(action_dim, 0.01)
+            self.critic = mlp(1, 1.0)
+            self.log_std = nn.Parameter(torch.full((action_dim,), math.log(max(init_std, min_std))))
 
-            self.log_std = nn.Parameter(torch.zeros(action_dim))
+        @property
+        def std(self):
+            # Identical floor in sampling, likelihood and entropy. Below the floor
+            # the scale gradient is zero, as required by this parameterization.
+            return self.log_std.clamp_min(math.log(self.min_std)).exp()
 
-        def forward(self, obs: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
-            mean = self.actor(obs)
-            val = self.critic(obs)
-            return mean, val
+        def forward(self, obs):
+            return self.actor(obs), self.critic(obs).squeeze(-1)
+
+        def _tensor(self, x):
+            return torch.as_tensor(x, dtype=self.log_std.dtype, device=self.log_std.device)
+
+        def act(self, obs, deterministic=False):
+            with torch.no_grad():
+                mean, value = self.forward(self._tensor(obs))
+                dist = Normal(mean, self.std)
+                action = mean if deterministic else dist.sample()
+                log_prob = dist.log_prob(action).sum(-1)
+                return tuple(t.cpu().numpy() for t in (action, log_prob, value))
+
+        def get_value(self, obs):
+            with torch.no_grad():
+                return self.critic(self._tensor(obs)).squeeze(-1).cpu().numpy()
+
+        def evaluate_actions(self, obs, actions):
+            mean, value = self.forward(self._tensor(obs))
+            dist = Normal(mean, self.std)
+            return (dist.log_prob(self._tensor(actions)).sum(-1), value,
+                    dist.entropy().sum(-1).mean())
+
+        def architecture(self):
+            return dict(observation_dim=self.observation_dim, action_dim=self.action_dim,
+                        hidden_dims=self.hidden_dims, activation=self.activation,
+                        min_std=self.min_std)
+
+        def get_weights(self):
+            """Export NumPy-compatible inference weights; training owns the tensors."""
+            result = {}
+            for name in ("actor", "critic"):
+                layers = [m for m in getattr(self, name) if isinstance(m, nn.Linear)]
+                result[name] = {
+                    "weights": [m.weight.detach().cpu().numpy().T.copy() for m in layers],
+                    "biases": [m.bias.detach().cpu().numpy().copy() for m in layers]}
+            result["log_std"] = self.log_std.detach().cpu().numpy().copy()
+            return result
+
+        def set_weights(self, weights):
+            with torch.no_grad():
+                for name in ("actor", "critic"):
+                    layers = [m for m in getattr(self, name) if isinstance(m, nn.Linear)]
+                    for layer, w, b in zip(layers, weights[name]["weights"], weights[name]["biases"]):
+                        layer.weight.copy_(self._tensor(w.T))
+                        layer.bias.copy_(self._tensor(b))
+                self.log_std.copy_(self._tensor(weights["log_std"]))

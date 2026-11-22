@@ -1,99 +1,28 @@
-# 📅 Sim-to-Real RL 7-Day Progressive Engineering Roadmap
+# Quadruped RL engineering roadmap
 
-This roadmap documents the modular, day-by-day architectural milestones for **`sim2real-robot-rl`**. Each milestone represents an incremental, fully tested subsystem designed to bridge the reality gap in dynamic legged locomotion.
+## Current checkpoint
 
----
+- Existing quadruped models, simulation environments, analytical trot baseline,
+  and historical outputs remain available.
+- Shared PPO now uses differentiable PyTorch losses and Adam updates.
+- NumPy networks remain inference-only and are rejected by the PPO trainer.
+- The isolated repair passes 64 tests and a bounded contextual-bandit learning gate.
+- Earlier PPO/DR learning and compute-budget conclusions are withdrawn because
+  the historical shared backend did not update weights.
 
-## 🏗️ Architecture Overview
+## Required next milestones
 
-```mermaid
-graph TD
-    subgraph Day1["Day 1: Modeling & Kinematics"]
-        M1["12-DOF Quadruped Model (URDF + MJCF)"]
-        M2["Spatial Math & Forward Kinematics Engine"]
-        M3["Inertia, Joint Limits & Verification Tests"]
-    end
+1. Run and inspect the PPO repair CI on the published commit.
+2. Audit production collectors, termination/truncation handling, reset behavior,
+   reward definitions, and evaluation metrics before fresh locomotion training.
+3. Demonstrate locomotion on nominal physics with valid training provenance.
+4. Evaluate DR with matched training budgets and a fixed evaluation protocol.
+5. Validate deployment interfaces, timing, and sensor assumptions separately.
 
-    subgraph Day2["Day 2: Environment & Physics Engine"]
-        E1["Gymnasium Locomotion Environment Wrapper"]
-        E2["Multi-Component Reward Formulation"]
-        E3["Terrain Generator (Flat, Slope, Rough)"]
-    end
+The shared buffer accepts explicit final-observation bootstrap values on truncation.
+This repair does not certify every legacy collector's use of that interface.
+Vectorized trainers, residual control, and heading experiments are outside this PR.
+No physical hardware transfer or real-time deployment is established here.
+Historical coverage percentages are not current repair coverage measurements.
 
-    subgraph Day3["Day 3: Deep Reinforcement Learning"]
-        A1["PPO Actor-Critic Neural Architecture"]
-        A2["Generalized Advantage Estimation (GAE)"]
-        A3["Vectorized Rollout Buffer & Training Loop"]
-    end
-
-    subgraph Day4["Day 4: Sim-to-Real Engine"]
-        S1["Domain Randomization (Mass, Friction, Damping)"]
-        S2["Sensor Noise & Observation Latency Buffer"]
-        S3["External Push & Perturbation Impulses"]
-    end
-
-    subgraph Day5["Day 5: Classical Control Baseline & Evaluation"]
-        B1["Model Predictive Control (MPC) Baseline"]
-        B2["Comparative Benchmark Suite (Energy, Fall Rate)"]
-        B3["Ablation Studies on Domain Randomization"]
-    end
-
-    subgraph Day6["Day 6: Automated Testing & CI"]
-        T1["Comprehensive Pytest Test Suite"]
-        T2["GitHub Actions CI Pipeline"]
-        T3["Benchmark Logging & Performance Artifacts"]
-    end
-
-    subgraph Day7["Day 7: Real-Time ROS 2 Deployment"]
-        D1["Real-Time C++/Python Policy Inference Node"]
-        D2["Joint Target Controller Bridge"]
-        D3["Full System Documentation & Demo"]
-    end
-
-    Day1 --> Day2 --> Day3 --> Day4 --> Day5 --> Day6 --> Day7
-```
-
----
-
-## 📌 Milestone Breakdown
-
-### ✅ Day 1: Modeling & Kinematics (Today)
-- [x] High-fidelity 12-DOF quadruped robot models in URDF and MJCF.
-- [x] Explicit joint limits, motor torque bounds ($\pm 35.5\,\text{N}\cdot\text{m}$), and foot contact friction.
-- [x] $SO(3)$ rotation algebra, quaternion kinematics, and forward foot kinematic transforms.
-- [x] Automated unit test suite verifying geometric and inertial parameters.
-
-### ✅ Day 2: Environment & Reward Formulation
-- [x] Gymnasium locomotion environment (`QuadrupedEnv`, `QuadrupedLocomotion-v0`) with 48-dim observation space and 12-dim continuous action space.
-- [x] High-fidelity multi-body contact dynamics engine with Hunt-Crossley spring-damper model and Coulomb friction cone.
-- [x] Multi-objective reward formulation (`RewardManager`) with decomposed velocity tracking, posture stability, torque, power, action rate, joint limit, and foot slip penalties.
-- [x] Procedural terrain engine (`ProceduralTerrain`) supporting flat ground, incline slopes, fractal rough heightfields, discrete stairs, and stepping stones.
-- [x] 28 comprehensive automated unit and integration tests (100% pass rate).
-
-### ✅ Day 3: PPO Policy & Training Loop
-- [x] Actor-Critic neural network architecture (`ActorCritic`, `NumpyMLP`) with Orthogonal initialization and diagonal Gaussian policy parameterization.
-- [x] On-policy rollout buffer (`RolloutBuffer`) with Generalized Advantage Estimation (GAE-Lambda) and advantage normalization.
-- [x] PPO algorithm (`PPO`) with clipped surrogate objective, value function loss, entropy exploration bonus, and KL divergence early stopping.
-- [x] Complete test suite (`test_network.py`, `test_buffer.py`, `test_ppo.py`) with 40 passing tests across the entire package.
-
-### ✅ Day 4: Native MuJoCo Physics & Domain Randomization Framework
-- [x] Official Python `mujoco` (v3.17+) rigid-body simulation environment (`MuJoCoQuadrupedEnv`).
-- [x] Standing equilibrium verified ($z = 0.3304\,\text{m}$, roll $< 0.3^\circ$, holding torque $5.64\,\text{N}\cdot\text{m} \ll 35.5\,\text{N}\cdot\text{m}$).
-- [x] Clear architectural separation: labeled `MockPhysicsEngine` as lightweight test double, reserving `MuJoCoQuadrupedEnv` for high-fidelity physics.
-- [x] Configuration-driven DR (`configs/dr_train.yaml`): friction $[0.40, 1.00]$, mass scale $\pm 15\%$, latency $0$–$10\,\text{ms}$, push $\le 15\,\text{N}$.
-
-### ✅ Day 5: Classical Control Baseline & Multi-Seed Sim-to-Sim Ablation
-- [x] Tuned analytical IK trotting gait generator (`AnalyticalTrotController`, $f=1.5\,\text{Hz}$, $h=0.08\,\text{m}$, $k_p=90, k_d=3$).
-- [x] Strictly defined metric formulas: $P_{\text{mech}} = \sum \max(\tau \dot{q}, 0)$, $\text{CoT} = P_{\text{mech}} / (mgv)$ (returns NaN for $v < 0.05\,\text{m/s}$), survival requiring forward displacement $\ge 0.5\,\text{m}$.
-- [x] Reproducible multi-seed evaluation pipeline (`scripts/run_reproducible_ablation.py`) across 6 suites (50 episodes/suite, fixed seeds 1000–1049).
-- [x] Documented negative results in `docs/SIM2REAL_ABLATION_REPORT.md` (PPO from scratch on CPU budget stays stationary; classical baseline walks with CoT 1.03–1.26).
-
-### ✅ Day 6: Automated Testing & Verification
-- [x] 54 unit and integration tests with **100% pass rate** (54 passed, 0 skipped, 0 failed).
-- [x] Measured **89% statement test coverage** (918 / 1026 statements) via `pytest-cov`.
-- [x] Range-validity regression test (`test/test_eval_protocol.py`) asserting all held-out suites lie strictly outside training DR bounds.
-
-### ⏳ Day 7: Real-Time ROS 2 Deployment & Policy Export
-- [ ] Policy ONNX/TorchScript export pipeline for embedded edge platforms.
-- [ ] ROS 2 Jazzy real-time inference node subscribing to `/joint_states` and `/imu/data`.
-- [ ] Publishing desired joint position commands to `/joint_group_controller/commands`.
+See [PPO repair scope and reproduction](PPO_REPAIR.md).
