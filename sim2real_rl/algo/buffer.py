@@ -37,6 +37,7 @@ class RolloutBuffer:
         self.actions = np.zeros((buffer_size, action_dim), dtype=np.float64)
         self.rewards = np.zeros(buffer_size, dtype=np.float64)
         self.dones = np.zeros(buffer_size, dtype=bool)
+        self.truncation_values = np.zeros(buffer_size, dtype=np.float64)
         self.values = np.zeros(buffer_size, dtype=np.float64)
         self.log_probs = np.zeros(buffer_size, dtype=np.float64)
         self.advantages = np.zeros(buffer_size, dtype=np.float64)
@@ -53,8 +54,18 @@ class RolloutBuffer:
         done: bool,
         value: float,
         log_prob: float,
+        *,
+        truncated: bool = False,
+        next_value: Optional[float] = None,
     ) -> None:
-        """Add a single step transition to the buffer."""
+        """Store the latent sampled action and its Gaussian log probability.
+
+        done means episode boundary (termination OR time limit). For a time
+        limit only, pass truncated=True and V(final observation) as next_value.
+        True termination takes precedence when both environment flags are true.
+        """
+        if truncated and (not done or next_value is None):
+            raise ValueError("Truncation requires done=True and final-observation next_value")
         if self.ptr >= self.buffer_size:
             raise IndexError("RolloutBuffer is full. Call compute_returns_and_advantages() and clear().")
 
@@ -62,6 +73,7 @@ class RolloutBuffer:
         self.actions[self.ptr] = np.asarray(action, dtype=np.float64)
         self.rewards[self.ptr] = float(reward)
         self.dones[self.ptr] = bool(done)
+        self.truncation_values[self.ptr] = float(next_value) if truncated else 0.0
         self.values[self.ptr] = float(value)
         self.log_probs[self.ptr] = float(log_prob)
 
@@ -74,7 +86,8 @@ class RolloutBuffer:
         Compute Generalized Advantage Estimation (GAE) and TD(lambda) returns.
 
         Recursive backward computation:
-            delta_t = r_t + gamma * V(s_{t+1}) * (1 - done_t) - V(s_t)
+            delta_t = r_t + gamma * bootstrap_t - V(s_t)
+            bootstrap_t = 0 at termination, V(final obs) at time limit
             A_t = delta_t + (gamma * lam) * (1 - done_t) * A_{t+1}
             R_t = A_t + V(s_t)
         """
@@ -89,7 +102,8 @@ class RolloutBuffer:
                 next_non_terminal = 1.0 - float(self.dones[t])
                 next_value = self.values[t + 1]
 
-            delta = self.rewards[t] + self.gamma * next_value * next_non_terminal - self.values[t]
+            bootstrap = self.truncation_values[t] if self.dones[t] else next_value
+            delta = self.rewards[t] + self.gamma * bootstrap - self.values[t]
             last_gae = delta + self.gamma * self.lam * next_non_terminal * last_gae
             self.advantages[t] = last_gae
 

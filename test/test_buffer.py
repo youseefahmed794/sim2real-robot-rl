@@ -74,3 +74,19 @@ def test_buffer_minibatch_generator():
         assert batch["actions"].shape[-1] == 12
 
     assert total_samples == 20
+
+
+def test_time_limit_bootstraps_final_obs_without_cross_episode_gae():
+    buf = RolloutBuffer(3, 1, 1, gamma=0.9, lam=0.8)
+    buf.add([0], [2], 1, True, 2, -1, truncated=True, next_value=4)
+    buf.add([0], [2], 100, True, 9, -1)  # unrelated reset episode
+    buf.add([0], [2], 3, False, 1, -1)   # rollout cutoff, no reset
+    buf.compute_returns_and_advantages(last_value=5)
+    np.testing.assert_allclose(buf.returns, [1+0.9*4, 100, 3+0.9*5])
+    np.testing.assert_array_equal(buf.actions, [[2], [2], [2]])
+
+
+def test_truncation_requires_final_observation_value():
+    buf = RolloutBuffer(1, 1, 1)
+    with pytest.raises(ValueError, match='final-observation'):
+        buf.add([0], [0], 1, True, 0, 0, truncated=True)

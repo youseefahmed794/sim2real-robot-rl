@@ -340,14 +340,9 @@ def generate_markdown_report(commit_hash, suites, baseline_res, nominal_res, dr_
             f.write(f"| **{s_name}** | PPO (With DR, 3 seeds) | {surv_m*100:.1f}±{surv_s*100:.1f}% | {dist_m:+.2f}±{dist_s:.2f} m | {rmse_m:.3f}±{rmse_s:.3f} | {cot_str} |\n")
 
         f.write("\n---\n\n")
-        f.write("## 2. Key Empirical Findings & Negative Results\n\n")
-        f.write("1. **PPO Locomotion Learning Gate**: Pure continuous PPO trained from scratch on CPU MuJoCo with 50k–100k steps failed to discover an active forward walking limit cycle. The policy converged to a conservative standing posture (mean velocity ~0.0 m/s), resulting in 0% survival (under the strict metric requiring forward progress >= 0.5m) and NaN Cost of Transport.\n")
-        f.write("2. **Domain Randomization Impact**: Because PPO did not learn forward locomotion under nominal physics, training with Domain Randomization did not improve velocity tracking. Both Condition A and Condition B exhibited ~0.50 m/s tracking RMSE.\n")
-        f.write("3. **Classical Trot Gait Effectiveness**: In contrast to learned PPO, the tuned analytical trotting controller achieved consistent forward locomotion (+0.24 m/s on nominal, CoT = 1.03), maintained 100% survival across high friction and heavy payload suites, but suffered significant forward slippage on the held-out low-friction suite (mu = 0.15).\n\n")
-
-        f.write("## 3. Limitations & Future Directions\n\n")
-        f.write("- **Compute Budget Constraints**: Training quadruped locomotion from scratch typically requires 50M+ environment transitions using GPU-accelerated simulators (Isaac Gym, MuJoCo MJX, or Genesis). CPU-bound training with 50k steps is insufficient for blind gait discovery.\n")
-        f.write("- **Prior Guidance**: Future work should explore Residual Reinforcement Learning or Teacher-Student imitation, where the RL policy modulates an underlying cyclic gait generator rather than learning 12-DOF coordination from scratch.\n")
+        f.write("## 2. Interpretation and validation scope\n\n")
+        f.write("This table contains measurements from this execution. No learning, DR advantage, or compute-budget conclusion is generated automatically. Inspect optimizer-update evidence, checkpoint provenance, termination/truncation handling, and paired evaluation results before drawing conclusions.\n\n")
+        f.write("Historical NumPy PPO outputs predate the optimizer repair and cannot support learning claims. See PPO_REPAIR.md. This is simulation evidence only; no physical hardware transfer is established.\n")
 
     print(f"Generated formal ablation report: {report_path}")
 

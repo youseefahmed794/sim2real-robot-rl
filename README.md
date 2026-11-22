@@ -1,14 +1,23 @@
 # 🦿 Sim-to-Real RL for Dynamic Quadruped Locomotion (PPO + Domain Randomization)
 
+> [!IMPORTANT]
+> The historical NumPy PPO path calculated losses without updating weights.
+> Its saved PPO/Domain Randomization tables are retained as historical output;
+> learning, compute-budget, and DR-effect conclusions from those runs are withdrawn.
+> The repaired PyTorch path passes 64 tests and a bounded contextual-bandit learning
+> gate in the isolated candidate. Corrected locomotion and hardware transfer remain
+> unvalidated. See [repair scope and reproduction](docs/PPO_REPAIR.md).
+
+
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB?logo=python)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C?logo=pytorch)](https://pytorch.org)
 [![ROS 2](https://img.shields.io/badge/ROS_2-Jazzy_Jalisco-3498db?logo=ros)](https://docs.ros.org/en/jazzy/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Development Status](https://img.shields.io/badge/Status-Day%206%20MuJoCo%20%26%20Ablations%20Completed-brightgreen.svg)](docs/ROADMAP.md)
-[![Tests](https://img.shields.io/badge/Tests-54%20passed%2C%200%20skipped%20%7C%2089%25%20coverage-brightgreen)](https://github.com/youseefahmed794/sim2real-robot-rl)
+[![Development Status](https://img.shields.io/badge/Status-Research%20prototype-blue)](docs/ROADMAP.md)
+[![PPO repair CI](https://github.com/youseefahmed794/sim2real-robot-rl/actions/workflows/ppo.yml/badge.svg)](https://github.com/youseefahmed794/sim2real-robot-rl/actions/workflows/ppo.yml)
 [![Physics](https://img.shields.io/badge/Physics-MuJoCo%203.17-blue)](https://mujoco.org)
 
-A production-grade, research-oriented **Sim-to-Real Reinforcement Learning framework** for dynamic legged robot locomotion. Designed to train agile, robust locomotion policies on a 12-DOF quadruped robot and transfer zero-shot to physical systems via comprehensive **Domain Randomization**, observation delay compensation, and a real-time ROS 2 deployment pipeline.
+A research prototype for quadruped locomotion simulation, analytical gait baselines, and PPO algorithm development. The current repair validates differentiable PPO updates on a controlled task. ROS 2 deployment and physical Sim-to-Real transfer remain development goals.
 
 Developed by **[Youseef Abdel Tawwab](https://github.com/youseefahmed794)** as part of the [Robotics & Embodied AI Graduate Portfolio Roadmap](https://github.com/youseefahmed794).
 
@@ -40,7 +49,7 @@ Deploying reinforcement learning policies trained in simulation directly to phys
 This project addresses these fundamental gaps through:
 - **Massive Dynamics Randomization**: Joint damping, link mass ($\pm 15\%$), ground friction ($\mu \in [0.2, 1.2]$), and push disturbances.
 - **Latency Emulation Buffer**: Training with randomized observation history queues to build latency-invariant policies.
-- **Comparative Baseline**: Direct benchmarking against a classical Model Predictive Control (Convex MPC) framework.
+- **Comparative Baseline**: An analytical inverse-kinematics trot controller; no convex MPC baseline is claimed.
 
 ---
 
@@ -88,8 +97,8 @@ Development is structured into daily verified milestones:
 | **Day 2** | **Gymnasium Locomotion Env** | 🚀 **Completed** | 48-dim state, 12-dim action, multi-reward decomposition, terrain generator |
 | **Day 3** | **PPO Policy & Rollout Buffer** | 🚀 **Completed** | Actor-Critic networks, vectorized GAE buffer, clipped surrogate loss |
 | **Day 4** | **Native MuJoCo Physics & Domain Randomization** | 🚀 **Completed** | Official `mujoco` 3.17 engine, standing equilibrium, mass/friction randomization, latency queue |
-| **Day 5** | **Analytical Trot Baseline & Sim-to-Real Ablations** | 🚀 **Completed** | Closed-form IK trotting baseline, multi-seed training ($N=3$), stress testing on 4 OOD environments |
-| **Day 6** | **Automated Testing & Verification** | 🚀 **Completed** | 46 tests passed (0 skipped, 0 failed), 89% statement coverage (896/1004 statements) |
+| **Day 5** | **Analytical baseline and historical evaluation** | Historical PPO conclusions withdrawn | Saved outputs retained; corrected locomotion/DR evaluation pending |
+| **Day 6** | **Algorithm verification** | Verified locally on the isolated repair | 64 tests and a contextual-bandit learning gate; coverage has not been remeasured |
 | **Day 7** | **ROS 2 Real-Time Inference** | ⏳ Planned | ROS 2 Jazzy node, real-time loop, TorchScript/ONNX export |
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for detailed architectural specifications.
@@ -113,7 +122,9 @@ We formulate locomotion as an infinite-horizon discounted Markov Decision Proces
 
 ---
 
-## 📊 Empirical Sim-to-Sim Ablation & Classical Baseline
+## 📊 Historical Sim-to-Sim Outputs and Classical Baseline
+
+The PPO rows below are historical measurements from the non-updating backend. They are not results from the repaired PPO implementation. This repair does not rerun or independently validate the historical classical-baseline rows.
 
 > [!IMPORTANT]
 > **Sim-to-Sim Verification Only**: These benchmarks evaluate numerical robustness and domain generalization within the native **MuJoCo 3.17** rigid-body physics simulator. **No hardware was used**, and these results do not claim zero-shot hardware transfer.
@@ -152,8 +163,8 @@ All evaluations follow the strict evaluation protocol defined in [`configs/dr_tr
 | **strong_push** | PPO (With DR, 3 seeds) | $0.0 \pm 0.0\%$ | $-0.02 \pm 0.00\,\text{m}$ | $0.506 \pm 0.000$ | NaN |
 
 ### Honest Diagnosis & Scientific Limitations
-1. **PPO Learning Outcome**: Continuous PPO trained from scratch on CPU MuJoCo with a budget of 50,000–100,000 steps converged to a stationary standing posture (mean velocity $-0.0011\,\text{m/s}$), failing to discover an active walking gait. Under the strict survival criterion requiring forward displacement $\ge 0.5\,\text{m}$, survival is $0.0\%$ and Cost of Transport is undefined (NaN).
-2. **Domain Randomization Finding**: Because the policy did not learn forward locomotion in nominal simulation, applying domain randomization during training did not improve forward velocity tracking.
+1. **Withdrawn PPO interpretation**: The earlier shared PPO path never updated weights. Its recorded outputs do not establish convergence, failed gait learning, or an insufficient compute budget.
+2. **Withdrawn DR interpretation**: The old A/B comparison cannot establish the effect of DR on policy learning. It must be rerun after validating the training and evaluation paths.
 3. **Classical Trot Controller Performance**: The tuned analytical IK baseline (`AnalyticalTrotController`, $f=1.5\,\text{Hz}$, $h=0.08\,\text{m}$) achieved forward locomotion across all suites with realistic physical CoT ($1.03$–$2.20$), but experienced increased foot scuffing on high friction ($\mu=1.40$).
 4. **Hardware Gap**: Real hardware deployment introduces backlash, motor temperature limits, and battery voltage sag not captured in simulation. Future RL work should leverage teacher-student imitation or residual control over the classical baseline rather than training from scratch on CPU.
 

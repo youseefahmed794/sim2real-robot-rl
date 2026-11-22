@@ -284,11 +284,9 @@ def run_comprehensive_ablation_study():
             f.write(f"| **PPO (With DR - Ours)** | **{d['survival_rate'][0]*100:.1f}% ± {d['survival_rate'][1]*100:.1f}%** | **{d['tracking_error'][0]:.4f} ± {d['tracking_error'][1]:.4f}** | **{d['cot'][0]:.2f} ± {d['cot'][1]:.2f}** |\n\n")
 
         f.write("---\n\n")
-        f.write("## 2. Key Scientific Observations & Honest Limitations\n\n")
-        f.write("1. **Sim-to-Real Reality Gap under Low Friction**: When tested on low-friction terrain (mu = 0.25), the nominal RL policy experiences foot slip and rapid orientation divergence, whereas the domain-randomized policy learned to adapt its stride frequency to maintain stability.\n")
-        f.write("2. **Cost of Transport Trade-off**: The classical analytical trotting baseline exhibits consistent energy consumption, while RL policies exhibit variable COT depending on foot clearance exploration.\n")
-        f.write("3. **Latency Impact**: Introducing a 20 ms communication delay highlights the importance of the observation delay queue; policies trained without delay show heightened susceptibility to limit-cycle oscillations.\n")
-        f.write("4. **Hardware Gap Note**: These benchmarks represent MuJoCo simulation tests. Real hardware deployment introduces additional challenges such as unmodeled backlash, thermal motor derating, and uneven terrain compliance.\n")
+        f.write("## 2. Interpretation and validation scope\n\n")
+        f.write("This table contains measurements from this execution. No learning, DR advantage, or compute-budget conclusion is generated automatically. Inspect optimizer-update evidence, checkpoint provenance, termination/truncation handling, and paired evaluation results before drawing conclusions.\n\n")
+        f.write("Historical NumPy PPO outputs predate the optimizer repair and cannot support learning claims. See PPO_REPAIR.md. This is simulation evidence only; no physical hardware transfer is established.\n")
 
     print(f"✅ Ablation study report successfully generated: {report_path}")
     print(f"Total experiment runtime: {time.time() - start_time:.1f} s")

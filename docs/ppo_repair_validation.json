@@ -1,0 +1,73 @@
+{
+  "scope": "Shared PPO algorithm diagnostic, not locomotion or hardware validation.",
+  "base_commit": "6fd44200c5bda735324ea583be87fadc13d5878f",
+  "selected_source_commit": "7a9fa64e012b55dd4383b09df86310bfa50f2c7b",
+  "candidate_source_sha256": {
+    "sim2real_rl/algo/network.py": {
+      "sha256": "6834387e963651e1a22fa6927a85109e1708b88eac5e4a2889273024cff76bbb",
+      "bytes": 13023
+    },
+    "sim2real_rl/algo/ppo.py": {
+      "sha256": "3daae7421756e68acb093811ec70065003592b46eb1f3d9d64ad5f4d2b718e9c",
+      "bytes": 6643
+    },
+    "sim2real_rl/algo/buffer.py": {
+      "sha256": "1a32b552638454b159890f959531a6e27eeac7df9758c0ccb35fad8596089855",
+      "bytes": 5399
+    },
+    "test/test_buffer.py": {
+      "sha256": "8b8fc026a6a80d6dd3c31d425c8659f0d2143879bc65e9b290575ee4e27bc562",
+      "bytes": 3545
+    },
+    "test/test_ppo_behavior.py": {
+      "sha256": "b0a31f208a0036743cbb9988f1f33f90bf17f5cfcb0754325fd4791e1c70c562",
+      "bytes": 7223
+    },
+    "scripts/prove_ppo_learning.py": {
+      "sha256": "bd20c1a6a94ec74e7f3c4c151c6980752a47008a6f3a8af4ead6320dd9414275",
+      "bytes": 3675
+    },
+    "pyproject.toml": {
+      "sha256": "c031973dbc7e33fe5e814c2103ee06b5d8877849a2326ab0235c0e71d06f028c",
+      "bytes": 970
+    },
+    "requirements.txt": {
+      "sha256": "3aa7103d1b054e55f8defc836a28f46209e4d38e01fa7aed011587df831ba39e",
+      "bytes": 97
+    }
+  },
+  "baseline_regression": {
+    "outcome": "Expected assertion failure: actor parameter change was zero.",
+    "stdout_sha256": "408371e2812205d072771bb8a1b3054a6edb383e1f9d37771983a574c3049050"
+  },
+  "tests": {
+    "passed": 64,
+    "failed": 0,
+    "skipped": 0,
+    "stdout_sha256": "dc93ccbd1386a6e5610d95f4e77b5043c762cddc8a064c475cdcfb9f58bafa7c"
+  },
+  "learning_gate": {
+    "task": "one-step continuous contextual bandit",
+    "seed": 20261026,
+    "heldout_seed": 20261027,
+    "heldout_inputs": 1024,
+    "transitions": 20480,
+    "acceptance": {
+      "heldout_mse_below": 0.01,
+      "mse_reduction_at_least": 0.9
+    },
+    "initial_mse": 0.12356419253002743,
+    "final_mse": 9.76805470098427e-05,
+    "mse_reduction": 0.9992094752936932,
+    "parameter_deltas_l2": {
+      "actor": 0.962885856628418,
+      "critic": 0.4725821614265442,
+      "log_std": 2.3038582801818848
+    },
+    "optimizer_steps": 1116,
+    "identical_checkpoint_reload": true,
+    "passed": true,
+    "torch_version": "2.14.1+cpu",
+    "numpy_version": "2.5.4"
+  }
+}

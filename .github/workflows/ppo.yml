@@ -1,0 +1,53 @@
+name: PPO repair verification
+
+on:
+  push:
+    branches: [main, review/ppo-optimizer-repair]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cpu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      CUDA_VISIBLE_DEVICES: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install 'torch>=2.0.0' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -r requirements.txt
+      - name: Record dependency versions
+        run: |
+          mkdir -p "$RUNNER_TEMP/ppo-evidence"
+          python -m pip freeze > "$RUNNER_TEMP/ppo-evidence/dependency-versions.txt"
+      - name: Test algorithm and existing simulation contracts
+        run: |
+          python -m pytest -c /dev/null --noconftest -o addopts= -p no:cacheprovider --color=no -ra --junitxml="$RUNNER_TEMP/ppo-evidence/tests.xml" test
+      - name: Verify bounded contextual-bandit learning
+        run: |
+          python scripts/prove_ppo_learning.py --output "$RUNNER_TEMP/ppo-evidence/learning-gate"
+      - name: Preserve validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ppo-repair-cpu-evidence
+          retention-days: 14
+          path: |
+            ${{ runner.temp }}/ppo-evidence/dependency-versions.txt
+            ${{ runner.temp }}/ppo-evidence/tests.xml
+            ${{ runner.temp }}/ppo-evidence/learning-gate/bandit.json
